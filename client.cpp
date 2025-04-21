@@ -13,6 +13,7 @@
 #define DEFAULT_PORT 1601
 #define SERVER_CLIENT_CLOSE_CONNECTION_SYMBOL '#'
 #define ERROR_S "SERVER ERROR: "
+#define BUFFER_SIZE 1024
 
 bool is_client_connection_closed(const char* msg) {
 	for(int i = 0; i < strlen(msg); i++)
@@ -39,5 +40,20 @@ int main(argc, const char* argv[]) {
 
 	std::cout << std::endl
 		<< "Client socket was successfully created." << std::endl;
+
+	int ret = connect(client, reinterpret_cast<struct sockaddr*>(&server_address),
+		sizeof(server_address));
+	if(ret == 0)
+		std::cout <<"=> Connection to server " 
+			<< inet_ntoa(server_address.sin_addr) <<
+			<< "with port number " << DEFAULT_PORT << std::endl;
+	
+	char buffer[BUFFER_SIZE];
+	std::cout << "Waiting for server confirmation..." << std::endl;
+	recv(client, buffer, BUFFER_SIZE, 0);
+	std::cout << "=> Connection established.\n"
+		<< "Enter" << SERVER_CLIENT_CLOSE_CONNECTION_SYMBOL
+		<< " to close connection." << std::endl; 
+
 	return 0;
 }
