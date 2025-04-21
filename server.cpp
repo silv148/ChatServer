@@ -11,6 +11,16 @@
 
 #define ERROR_S "SERVER ERROR: "
 #define DEFAULT_PORT 1601
+#define BUFFER_SIZE 1024
+#define CLIENT_CLOSE_CONNECTION_SYMBOL '#'
+
+bool is_client_connection_closed(const char* msg) {
+	for(int i = 0; i < strlen(msg); i++)
+		if (msg[i] == CLIENT_CLOSE_CONNECTION_SYMBOL)
+			return true;
+
+	return false
+}
 
 int main(int argc, char const* argv[]) {
 	int client;
@@ -38,7 +48,44 @@ int main(int argc, char const* argv[]) {
 		return -1;
 	}
 	
-	int size = sizeof(server_address);
+	socklen_t size = sizeof(server_address);
 	std::cout << "SERVER: Listening clients...";
 	listen(client, 1);
+
+	server = accept(client, reinterpret_cast<struct sockaddr*>(&server_address), &size);
+	if (server < 0)
+		std::cout << ERROR_S <<"Can't accepting connection.";
+
+	char buffer[BUFFER_SIZE];
+	bool isExit=false
+	while(server > 0) {
+		strcpy(buffer, "=? Server connected.\n");
+		send(server, buffer, BUFFER_SIZE, 0);
+		std::cout << "=> Connected to client. #1\n" << "Enter # to end connection.\n";
+
+		std::cout << "Client: "
+		recv(server, buffer, BUFFER_SIZE, 0);
+		std::cout << buffer << std::endl;
+		if(is_client_connection_closed(buffer))
+			isExit=true;
+
+		while(isExit) {
+			std::cout << "Client: ";
+			std::cin.getline(buffer, BUFFER_SIZE);
+			send(server, buffer, BUFFER_SIZE, 0);
+			if(is_client_connection_closed(buffer))
+				break;
+
+			std::cout << "Client: ";
+			recv(server, buffer, BUFFER_SIZE, 0);
+			std::cout << buffer << std::endl;
+			if(is_client_connection_closed(buffer))
+				break;
+		}
+		std::cout << std::endl;
+		std::cout << "SERVER: Closing connection...\n";
+		isExit=false;
+		exit(1);
+	}
+	return 0;
 }
