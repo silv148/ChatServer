@@ -1,4 +1,7 @@
 all: server client
 
 server:
-	g++ server -o server server -w
+	g++ server.cpp -o server -w
+
+client:
+	g++ client.cpp -o client -w

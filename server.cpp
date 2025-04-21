@@ -19,7 +19,7 @@ bool is_client_connection_closed(const char* msg) {
 		if (msg[i] == CLIENT_CLOSE_CONNECTION_SYMBOL)
 			return true;
 
-	return false
+	return false;
 }
 
 int main(int argc, char const* argv[]) {
@@ -36,7 +36,7 @@ int main(int argc, char const* argv[]) {
 
 	std::cout << "SERVER: Socket for server was successdully created.";
 	
-	server_address.sin_port = htons(8080);
+	server_address.sin_port = htons(DEFAULT_PORT);
 	server_address.sin_family = AF_INET;
 	server_address.sin_addr.s_addr = htons(INADDR_ANY);
 
