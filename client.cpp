@@ -9,6 +9,7 @@
 #include <netdb.h>
 #include <netinet/in.h>
 
+#define ERROR_S "CLIENT ERROR: "
 #define SERVER_IP "127.0.0.1"
 #define DEFAULT_PORT 1601
 #define SERVER_CLIENT_CLOSE_CONNECTION_SYMBOL '#'
@@ -53,7 +54,27 @@ int main(argc, const char* argv[]) {
 	recv(client, buffer, BUFFER_SIZE, 0);
 	std::cout << "=> Connection established.\n"
 		<< "Enter" << SERVER_CLIENT_CLOSE_CONNECTION_SYMBOL
-		<< " to close connection." << std::endl; 
+		<< " to close connection." << std::endl;
+		
+	while (true) {
+		std::cout << "Client: ";
+		std::cin.getline(buffer, BUFFER_SIZE);
+		send(client, buffer, BUFFER_SIZE, 0);
+		if (is_client_connection_closed(buffer)) {
+			std::cout << "Closing connection..." << std::endl;
+			break;
+		}
 
+		std::cout << "Server: ";
+		recv(client, buffer, BUFFER_SIZE, 0);
+		std::cout << buffer << std::endl;
+		if (is_client_connection_closed(buffer)) {
+			std::cout << "Closing connection..." << std::endl;
+			break;
+		}
+		std::cout << std::endl;
+	}
+	close(client);
+	std::cout << "Connection closed." << std::endl;
 	return 0;
 }
